@@ -53,24 +53,9 @@ class Gromacs:
         if self.previous_stages.get('dev', None) is not None:
             if building_blocks.get('fftw', None) is not None:
                 self.stage += building_blocks['fftw'].runtime(_from='dev')
-                # self.stage += hpccm.primitives.copy(_from='dev',
-                #                                     _mkdir=True,
-                #                                     src=['/usr/local/fftw'],
-                #                                     dest='/usr/local/fftw')
-                # self.stage += hpccm.primitives.environment(
-                #     variables={'LD_LIBRARY_PATH': '/usr/local/fftw/lib:$LD_LIBRARY_PATH'}
-                # )
 
             if building_blocks.get('mpi', None) is not None:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
-                # TODO : need to consider impi as well
-                # self.stage += hpccm.primitives.copy(_from='dev',
-                #                                     _mkdir=True,
-                #                                     src=['/usr/local/openmpi'],
-                #                                     dest='/usr/local/openmpi')
-                # self.stage += hpccm.primitives.environment(variables={
-                #     'PATH': '/usr/local/openmpi/bin:$PATH',
-                #     'LD_LIBRARY_PATH': '/usr/local/openmpi/lib:$LD_LIBRARY_PATH'})
 
     def __gromacs(self, *, args, building_blocks):
         self.stage += hpccm.primitives.label(metadata={'gromacs.version': args.gromacs})

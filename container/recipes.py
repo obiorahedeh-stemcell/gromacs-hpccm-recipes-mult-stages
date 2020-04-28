@@ -13,7 +13,6 @@ import hpccm
 
 import config
 from container.apps import Gromacs
-from utilities.cli import tools_order
 
 
 # current module
@@ -53,12 +52,10 @@ def get_mpi(*, args, building_blocks):
         if hasattr(building_blocks['compiler'], 'toolchain'):
             cuda_enabled = True if args.cuda is not None else False
             if args.openmpi is not None:
-                building_blocks['mpi'] = hpccm.building_blocks.openmpi(
-                    cuda=cuda_enabled,
-                    infiniband=False,
-                    toolchain=building_blocks['compiler'].toolchain,
-                    version=args.openmpi
-                )
+                building_blocks['mpi'] = hpccm.building_blocks.openmpi(cuda=cuda_enabled,
+                                                                       infiniband=False,
+                                                                       toolchain=building_blocks['compiler'].toolchain,
+                                                                       version=args.openmpi)
             elif args.impi is not None:
                 raise RuntimeError('impi is not supported')
 
@@ -81,11 +78,9 @@ def get_fftw(*, args, building_blocks):
                 if not args.double:
                     configure_opts.append('--enable-float')
 
-                building_blocks['fftw'] = hpccm.building_blocks.fftw(
-                    toolchain=building_blocks['compiler'].toolchain,
-                    configure_opts=configure_opts,
-                    version=args.fftw
-                )
+                building_blocks['fftw'] = hpccm.building_blocks.fftw(toolchain=building_blocks['compiler'].toolchain,
+                                                                     configure_opts=configure_opts,
+                                                                     version=args.fftw)
             else:
                 raise RuntimeError('compiler is not an HPCCM building block')
         else:
@@ -126,24 +121,9 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
     if previous_stages.get('dev', None) is not None:
         if building_blocks.get('fftw', None) is not None:
             stage += building_blocks['fftw'].runtime(_from='dev')
-            # stage += hpccm.primitives.copy(_from='dev',
-            #                                _mkdir=True,
-            #                                src=['/usr/local/fftw'],
-            #                                dest='/usr/local/fftw')
-            # stage += hpccm.primitives.environment(
-            #     variables={'LD_LIBRARY_PATH': '/usr/local/fftw/lib:$LD_LIBRARY_PATH'}
-            # )
 
         if building_blocks.get('mpi', None) is not None:
             stage += building_blocks['mpi'].runtime(_from='dev')
-            # TODO : need to consider impi as well
-            # stage += hpccm.primitives.copy(_from='dev',
-            #                                _mkdir=True,
-            #                                src=['/usr/local/openmpi'],
-            #                                dest='/usr/local/openmpi')
-            # stage += hpccm.primitives.environment(variables={
-            #     'PATH': '/usr/local/openmpi/bin:$PATH',
-            #     'LD_LIBRARY_PATH': '/usr/local/openmpi/lib:$LD_LIBRARY_PATH'})
 
     if previous_stages.get('gromacs', None) is not None:
         stage += hpccm.primitives.copy(_from='gromacs',

@@ -9,24 +9,6 @@ import collections
 import config
 
 
-# Specifying the ordering of the tools
-# double and regtest don't need any ordering, as these does not corresponds to any method
-tools_order = [
-    'ubuntu',
-    'centos',
-    'cuda',
-    'cmake',
-    'gcc',
-    'openmpi',
-    'impi',
-    'fftw',
-    'gromacs',
-    'regtest',
-    'engines',
-    'format',
-]
-
-
 class CLI:
     def __init__(self, *, parser):
         self.parser = parser
@@ -105,29 +87,3 @@ class CLI:
                                rdtscp='on' if 'rdtscp' in flags.lower() else 'off')
 
         return engine
-
-    # Remove the following methods
-    def get_stages(self):
-        '''
-        This method will create list of stages required for generating Container specifications
-        Our aim is to generate Container specifications in three stages:
-            * development stage : build and install tools like gnu, cmake, fftw,... (using hpccm building blocks)
-            * Application stage : Build and install actual Container application
-            * Deploy stage      : Deploy the application
-        '''
-
-        stages = collections.OrderedDict(DevelopmentStage={}, ApplicationStage={}, DeploymentStage={})
-
-        for key in self.args.__dict__:
-            value = getattr(self.args, key)
-            if value:
-                if 'dev' in key:
-                    stages['DevelopmentStage'][key[key.rfind('_') + 1:]] = value
-
-                if 'app' in key:
-                    stages['ApplicationStage'][key[key.rfind('_') + 1:]] = value
-
-                if 'dep' in key:
-                    stages['DeploymentStage'][key[key.rfind('_') + 1:]] = value
-
-        return stages
