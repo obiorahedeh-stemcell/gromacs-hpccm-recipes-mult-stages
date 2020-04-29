@@ -12,18 +12,11 @@ HPCCM recipes for GROMACS build and installation
 
 
 ## Running Image
-The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled and `mdrun` value:
+The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled:
 option on `docker_build.py`:
 
 * `gmx`
 * `gmx_mpi`
-* `mdrun`
-* `mdrun_mpi`
-
-Wrapper binaries `mdrun` and `mdrun_mpi` represent `mdrun_only` installation of GROMACS.
-To use other GROMACS tools such as `pdb2gmx`, `grompp`, `editconf` etc. full installation
-of GROMACS are required. Full installation of GROMACS are wrapped within `gmx` and `gmx_mpi`.
-
 
 #### Without Singularity
 
