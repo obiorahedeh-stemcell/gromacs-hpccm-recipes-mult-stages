@@ -42,7 +42,9 @@ class Gromacs:
         self.__add__engines(args=args, building_blocks=building_blocks)
 
     def __prepare(self, *, stage_name, building_blocks):
-        # adding os_packages required for this stage application
+        '''
+        Prepare the stage
+        '''
         self.stage += hpccm.primitives.baseimage(image=self.base_image, _as=stage_name)
         self.stage += hpccm.building_blocks.packages(ospackages=self._os_packages)
         for bb in ('compiler', 'cmake'):
@@ -58,6 +60,9 @@ class Gromacs:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
 
     def __gromacs(self, *, args, building_blocks):
+        '''
+        Feed the stage with GROMACS related stuff
+        '''
         self.stage += hpccm.primitives.label(metadata={'gromacs.version': args.gromacs})
         # relative to /var/tmp
         self.source_directory = 'gromacs-{version}'.format(version=args.gromacs)
@@ -76,7 +81,7 @@ class Gromacs:
                                                          building_blocks=building_blocks)
 
     def __regtest(self, *, args):
-        # We may try with installing perl in using ospackages primitives
+        # TODO: We may try with installing perl in using ospackages primitives
         if args.regtest:
             # preinstall
             self.preconfigure = ['apt-get update',
@@ -86,7 +91,9 @@ class Gromacs:
             self.check = True
 
     def __add__engines(self, *, args, building_blocks):
-        # TODO : Deal with default engine. Move default engine chooser here or in config
+        '''
+        Adding GROMACS engine the container
+        '''
         for engine in args.engines:
             # binary and library suffix for gmx
             parsed_engine = self.__parse_engine(engine)
@@ -111,6 +118,9 @@ class Gromacs:
                                                               check=self.check)
 
     def __parse_engine(self, engine):
+        '''
+        Parsing engine's value
+        '''
         if engine:
             engine_args = map(lambda x: x.strip(), engine.split(':'))
             engine_args_dict = {}
@@ -193,4 +203,7 @@ class Gromacs:
                                                   rdtscp=config.GMX_ENGINE_SUFFIX_OPTIONS['rdtscp'] if rdtscp.lower() == 'on' else '')
 
     def __call__(self):
+        '''
+        Return the stage and the name of the wrapper binaries
+        '''
         return (self.stage, self.wrapper)

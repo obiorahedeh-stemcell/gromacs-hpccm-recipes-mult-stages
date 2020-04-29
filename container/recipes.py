@@ -18,10 +18,14 @@ from container.apps import Gromacs
 # current module
 current_module = sys.modules[__name__]
 
+# common os packages required in the final image
 os_packages = ['vim']
 
 
 def get_base_image(*, args):
+    '''
+    Identify the base image to be used in every stage
+    '''
     if args.cuda is not None:
         # TODO : add on second iteration
         raise RuntimeError('cuda is not supported.')
@@ -37,6 +41,9 @@ def get_base_image(*, args):
 
 
 def get_compiler(*, args, building_blocks):
+    '''
+    Identify the compiler. At this moment, only gnu compiler is supported
+    '''
     if args.gcc is not None:
         building_blocks['compiler'] = hpccm.building_blocks.gnu(
             extra_repository=True,
@@ -48,6 +55,9 @@ def get_compiler(*, args, building_blocks):
 
 
 def get_mpi(*, args, building_blocks):
+    '''
+    Identify mpi. At this moment only openmpi is supported
+    '''
     if building_blocks.get('compiler', None) is not None:
         if hasattr(building_blocks['compiler'], 'toolchain'):
             cuda_enabled = True if args.cuda is not None else False
@@ -66,10 +76,16 @@ def get_mpi(*, args, building_blocks):
 
 
 def get_cmake(*, args, building_blocks):
+    '''
+    Cmake
+    '''
     building_blocks['cmake'] = hpccm.building_blocks.cmake(eula=True, version=args.cmake)
 
 
 def get_fftw(*, args, building_blocks):
+    '''
+    fftw :
+    '''
     if args.fftw is not None:
         if building_blocks.get('compiler', None) is not None:
             if hasattr(building_blocks['compiler'], 'toolchain'):
@@ -88,8 +104,9 @@ def get_fftw(*, args, building_blocks):
 
 
 def get_building_blocks(*, args):
-
-    # Create all reuseable building blocks
+    '''
+    Create all reuseable building blocks used in multiple stages
+    '''
     building_blocks = collections.OrderedDict()
     for bb in ('get_compiler', 'get_mpi', 'get_cmake', 'get_fftw'):
         getattr(current_module, bb)(args=args, building_blocks=building_blocks)
@@ -98,6 +115,10 @@ def get_building_blocks(*, args):
 
 
 def get_dev_stage(*, stage_name='dev', args, building_blocks):
+    '''
+    This is the initial/development stage reponsible for building images with
+    all required dependencies such as openmpi, fftw for GROMACS
+    '''
     stage = hpccm.Stage()
     stage += hpccm.primitives.baseimage(image=get_base_image(args=args), _as=stage_name)
 
@@ -109,6 +130,9 @@ def get_dev_stage(*, stage_name='dev', args, building_blocks):
 
 
 def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
+    '''
+    This deploy the GROMACS along with it dependencies (fftw, mpi) to the final image
+    '''
     stage = hpccm.Stage()
     stage += hpccm.primitives.baseimage(image=get_base_image(args=args))
     stage += hpccm.building_blocks.python(python3=True, python2=False, devel=False)
@@ -135,7 +159,7 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
 
     stage += hpccm.primitives.shell(commands=['mkdir -p {}'.format(scripts_directory)])
 
-    # setting arapper sctipt
+    # setting wrapper sctipt
     wrapper = os.path.join(scripts_directory, wrapper)
     stage += hpccm.primitives.copy(src='/scripts/wrapper.py', dest=wrapper)
 
@@ -158,7 +182,7 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
 
 def prepare_and_cook(*, args):
     '''
-    This method prepare the recipe and cook it
+    This method prepare the recipes and cook it
     '''
     stages = collections.OrderedDict()
     building_blocks = get_building_blocks(args=args)
@@ -181,4 +205,5 @@ def prepare_and_cook(*, args):
 
     # cooking
     for stage in stages.values():
-        print(stage)
+        if stage is not None:
+            print(stage)

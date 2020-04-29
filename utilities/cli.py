@@ -10,6 +10,10 @@ import config
 
 
 class CLI:
+    '''
+    Command Line Interface to gather information regarding the container specification from the user
+    '''
+
     def __init__(self, *, parser):
         self.parser = parser
         # Setting Command line arguments
@@ -18,7 +22,6 @@ class CLI:
         self.args = self.parser.parse_args()
 
     def __set_cmd_options(self):
-        # Minimal environment requirement
         self.parser.add_argument('--format', type=str, default='docker', choices=['docker', 'singularity'],
                                  help='Container specification format (default: docker).')
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
