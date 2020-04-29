@@ -11,7 +11,6 @@ HPCCM recipes for GROMACS build and installation
 
 ## Running Image
 The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled (enabling double precision not supported yet):
-option on `docker_build.py`:
 
 * `gmx`
 * `gmx_mpi`

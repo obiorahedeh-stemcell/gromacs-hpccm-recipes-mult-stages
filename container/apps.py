@@ -94,7 +94,8 @@ class Gromacs:
         '''
         Adding GROMACS engine the container
         '''
-        for engine in args.engines:
+        # We dont want to use the same engine multiple times
+        for engine in set(args.engines):
             # binary and library suffix for gmx
             parsed_engine = self.__parse_engine(engine)
             bin_libs_suffix = self.__get_bin_libs_suffix(parsed_engine['rdtscp'],
