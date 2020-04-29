@@ -1,11 +1,10 @@
 # GROMACS 2020.1
 HPCCM recipes for GROMACS build and installation
 
-####Usage:
+#### Usage:
 
     $ ./gromacs_docker_builds.py -h/--help
 
-## Building Image
 ##### Sample Commands
     ./gromacs_docker_builds.py --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
 
@@ -26,3 +25,7 @@ Bind the directory that you want Docker to get access to. Below is an example of
 ## Dependencies
 
 * `python3`
+* `libgomp1`
+* `openmpi`
+* `fftw`
+
