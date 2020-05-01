@@ -27,8 +27,14 @@ def get_base_image(*, args):
     Identify the base image to be used in every stage
     '''
     if args.cuda is not None:
-        # TODO : add on second iteration
-        raise RuntimeError('cuda is not supported.')
+        cuda_version_tag = 'nvidia/cuda:' + args.cuda + '-devel'
+        if args.centos is not None:
+            cuda_version_tag += '-centos' + args.centos
+        elif args.ubuntu is not None:
+            cuda_version_tag += '-ubuntu' + args.ubuntu
+        else:
+            raise RuntimeError('Logic error: no Linux distribution selected.')
+        base_image = cuda_version_tag
     else:
         if args.ubuntu is not None:
             base_image = 'ubuntu:' + args.ubuntu
