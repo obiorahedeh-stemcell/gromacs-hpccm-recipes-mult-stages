@@ -1,4 +1,4 @@
-# GROMACS 2020.1
+# GROMACS
 HPCCM recipes for GROMACS build and installation
 
 #### Usage:
