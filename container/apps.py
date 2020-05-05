@@ -5,7 +5,7 @@ import config
 
 
 class Gromacs:
-    _os_packages = ['wget']
+    _os_packages = ['wget', 'perl']
     _cmake_opts = "\
                 -DCMAKE_INSTALL_BINDIR=bin.$simd$ \
                 -DCMAKE_INSTALL_LIBDIR=lib.$simd$ \
@@ -33,7 +33,6 @@ class Gromacs:
         self.base_image = base_image
         self.previous_stages = previous_stages
         # The following two will be required in generic_cmake
-        self.preconfigure = []
         self.check = False
 
         self.__prepare(stage_name=stage_name, building_blocks=building_blocks)
@@ -43,7 +42,8 @@ class Gromacs:
 
     def __prepare(self, *, stage_name, building_blocks):
         '''
-        Prepare the stage
+        Prepare the stage. Add the base image, ospackages, building blocks and
+        runtime for openmpi and fftw from previous stage
         '''
         self.stage += hpccm.primitives.baseimage(image=self.base_image, _as=stage_name)
         self.stage += hpccm.building_blocks.packages(ospackages=self._os_packages)
@@ -83,10 +83,6 @@ class Gromacs:
     def __regtest(self, *, args):
         # TODO: We may try with installing perl in using ospackages primitives
         if args.regtest:
-            # preinstall
-            self.preconfigure = ['apt-get update',
-                                 'apt-get upgrade -y',
-                                 'apt-get install -y perl', ]
             # allow regression test
             self.check = True
 
@@ -94,7 +90,7 @@ class Gromacs:
         '''
         Adding GROMACS engine the container
         '''
-        # We dont want to use the same engine multiple times
+        # We dont want to use build the identical engine multiple times
         for engine in set(args.engines):
             # binary and library suffix for gmx
             parsed_engine = self.__parse_engine(engine)
@@ -115,7 +111,6 @@ class Gromacs:
                                                               prefix=self.prefix,
                                                               build_environment=self.build_environment,
                                                               url=self.url,
-                                                              preconfigure=self.preconfigure,
                                                               check=self.check)
 
     def __parse_engine(self, engine):
