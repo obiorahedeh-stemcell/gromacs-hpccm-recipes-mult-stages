@@ -7,25 +7,26 @@ import config
 class Gromacs:
     _os_packages = ['wget', 'perl']
     _cmake_opts = "\
-                -DCMAKE_INSTALL_BINDIR=bin.$simd$ \
-                -DCMAKE_INSTALL_LIBDIR=lib.$simd$ \
-                -DCMAKE_C_COMPILER=$c_compiler$ \
-                -DCMAKE_CXX_COMPILER=$cxx_compiler$ \
-                -DGMX_OPENMP=ON \
-                -DGMX_MPI=$mpi$ \
-                -DGMX_GPU=$cuda$ \
-                -DGMX_SIMD=$simd$ \
-                -DGMX_USE_RDTSCP=$rdtscp$ \
-                -DGMX_DOUBLE=$double$ \
-                -D$fft$ \
-                -DGMX_EXTERNAL_BLAS=OFF \
-                -DGMX_EXTERNAL_LAPACK=OFF \
-                -DBUILD_SHARED_LIBS=OFF \
-                -DGMX_PREFER_STATIC_LIBS=ON \
-                -DREGRESSIONTEST_DOWNLOAD=$regtest$ \
-                -DGMX_DEFAULT_SUFFIX=OFF \
-                -DGMX_BINARY_SUFFIX=$bin_suffix$ \
-                -DGMX_LIBS_SUFFIX=$libs_suffix$ \
+                -D CMAKE_BUILD_TYPE=Release \
+                -D CMAKE_INSTALL_BINDIR=bin.$simd$ \
+                -D CMAKE_INSTALL_LIBDIR=lib.$simd$ \
+                -D CMAKE_C_COMPILER=$c_compiler$ \
+                -D CMAKE_CXX_COMPILER=$cxx_compiler$ \
+                -D GMX_OPENMP=ON \
+                -D GMX_MPI=$mpi$ \
+                -D GMX_GPU=$cuda$ \
+                -D GMX_SIMD=$simd$ \
+                -D GMX_USE_RDTSCP=$rdtscp$ \
+                -D GMX_DOUBLE=$double$ \
+                -D $fft$ \
+                -D GMX_EXTERNAL_BLAS=OFF \
+                -D GMX_EXTERNAL_LAPACK=OFF \
+                -D BUILD_SHARED_LIBS=OFF \
+                -D GMX_PREFER_STATIC_LIBS=ON \
+                -D REGRESSIONTEST_DOWNLOAD=$regtest$ \
+                -D GMX_DEFAULT_SUFFIX=OFF \
+                -D GMX_BINARY_SUFFIX=$bin_suffix$ \
+                -D GMX_LIBS_SUFFIX=$libs_suffix$ \
                 "
 
     def __init__(self, *, stage_name, base_image, args, building_blocks, previous_stages):
@@ -156,7 +157,7 @@ class Gromacs:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$c_compiler$', 'mpicc')
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$cxx_compiler$', 'mpicxx')
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$mpi$', 'ON')
-            gromacs_cmake_opts = gromacs_cmake_opts + " -DMPIEXEC_PREFLAGS='--allow-run-as-root;--oversubscribe'"
+            gromacs_cmake_opts = gromacs_cmake_opts + " -D MPIEXEC_PREFLAGS='--allow-run-as-root;--oversubscribe'"
         else:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$c_compiler$', 'gcc')
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$cxx_compiler$', 'g++')

@@ -73,8 +73,10 @@ def get_mpi(*, args, building_blocks):
                                                                        toolchain=building_blocks['compiler'].toolchain,
                                                                        version=args.openmpi)
             elif args.impi is not None:
-                raise RuntimeError('impi is not supported')
+                # building_blocks['mpi'] = hpccm.building_blocks.intel_mpi(eula=True,
+                #                                                          version=args.impi)
 
+                raise RuntimeError('impi is not supported')
         else:
             raise RuntimeError('compiler is not an HPCCM building block')
     else:

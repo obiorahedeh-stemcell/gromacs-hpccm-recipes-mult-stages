@@ -25,15 +25,18 @@ class CLI:
         self.parser.add_argument('--format', type=str, default='docker', choices=['docker', 'singularity'],
                                  help='Container specification format (default: docker).')
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
+                                 choices=['2020.1', '2020.2'],
                                  help='set GROMACS version (default: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
-        self.parser.add_argument('--fftw', type=str,
+        self.parser.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
                                  help='set fftw version. If not provided, GROMACS installtion will download and build FFTW from source.')
 
         self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
+                                 choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
                                  help='cmake version (default: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
 
         self.parser.add_argument('--gcc', type=str, default=config.DEFAULT_GCC_VERSION,
+                                 choices=['5', '6', '7', '8', '9'],
                                  help='gcc version (default: {0}).'.format(config.DEFAULT_GCC_VERSION))
 
         # Optional environment requirement
@@ -51,13 +54,19 @@ class CLI:
 
     def __set_mpi_options(self):
         mpi_group = self.parser.add_mutually_exclusive_group()
-        mpi_group.add_argument('--openmpi', type=str, help='enable and set OpenMPI version.')
+        mpi_group.add_argument('--openmpi', type=str,
+                               choices=['3.0.0', '4.0.0'],
+                               help='enable and set OpenMPI version.')
         mpi_group.add_argument('--impi', type=str, help='enable and set Intel MPI version.')
 
     def __set_linux_distribution(self):
         linux_dist_group = self.parser.add_mutually_exclusive_group()
-        linux_dist_group.add_argument('--ubuntu', type=str, help='enable and set linux dist : ubuntu.')
-        linux_dist_group.add_argument('--centos', type=str, help='enable and set linux dist : centos.')
+        linux_dist_group.add_argument('--ubuntu', type=str,
+                                      choices=['16.04', '18.04', '19.10', '20.4'],
+                                      help='enable and set linux dist : ubuntu.')
+        linux_dist_group.add_argument('--centos', type=str,
+                                      choices=['5', '6', '7', '8'],
+                                      help='enable and set linux dist : centos.')
 
     def __set_gromacs_engines(self):
         self.parser.add_argument('--engines', type=str,
@@ -65,7 +74,9 @@ class CLI:
                                                                               rdtscp='|'.join(config.ENGINE_OPTIONS['rdtscp'])),
                                  nargs='+',
                                  default=[self.__get_default_gromacs_engine()],
-                                 help='Specifying SIMD for multiple gmx engines within same image container (default: {default} ["based on your cpu"]).'.format(
+                                 help='Specifying SIMD for multiple gmx engines within same image container. List of Available choices: {choices} \n(default: {default} ["based on your cpu"]).'.format(
+                                     choices=['simd=sse2:rdtscp=off', 'simd=sse2:rdtscp=on', 'simd=avx:rdtscp=off', 'simd=avx:rdtscp=on',
+                                              'simd=avx2:rdtscp=off', 'simd=avx2:rdtscp=on', 'simd=avx_512f:rdtscp=off', 'simd=avx_512f:rdtscp=on'],
                                      default=self.__get_default_gromacs_engine())
                                  )
 
