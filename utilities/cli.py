@@ -78,10 +78,10 @@ class CLI:
         linux_dist_group = self.parser.add_mutually_exclusive_group()
         linux_dist_group.add_argument('--ubuntu', type=str,
                                       choices=['16.04', '18.04', '19.10', '20.4'],
-                                      help='ENABLE and set UBUNTU version.')
+                                      help='ENABLE and set UBUNTU version as BASE IMAGE.')
         linux_dist_group.add_argument('--centos', type=str,
                                       choices=['5', '6', '7', '8'],
-                                      help='ENABLE and set CENTOS version.')
+                                      help='ENABLE and set CENTOS version as BASE IMAGE.')
 
     def __set_gromacs_engines(self):
         '''
