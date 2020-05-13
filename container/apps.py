@@ -1,3 +1,8 @@
+'''
+Author :
+    * Muhammed Ahad <ahad3112@yahoo.com, maaahad@gmail.com>
+'''
+
 import hpccm
 
 
@@ -5,6 +10,9 @@ import config
 
 
 class Gromacs:
+    '''
+    This class is responsible to build and install GROMACS with and withou regression test
+    '''
     _os_packages = ['wget', 'perl']
     _cmake_opts = "\
                 -D CMAKE_BUILD_TYPE=Release \
@@ -35,6 +43,7 @@ class Gromacs:
         self.previous_stages = previous_stages
         # The following two will be required in generic_cmake
         self.check = False
+        self.postinstall = []
 
         self.__prepare(stage_name=stage_name, building_blocks=building_blocks)
         self.__gromacs(args=args, building_blocks=building_blocks)
@@ -82,14 +91,13 @@ class Gromacs:
                                                          building_blocks=building_blocks)
 
     def __regtest(self, *, args):
-        # TODO: We may try with installing perl in using ospackages primitives
         if args.regtest:
             # allow regression test
             self.check = True
 
     def __add__engines(self, *, args, building_blocks):
         '''
-        Adding GROMACS engine the container
+        Adding GROMACS engine to the container
         '''
         # We dont want to use build the identical engine multiple times
         for engine in set(args.engines):
@@ -106,13 +114,34 @@ class Gromacs:
                 value = parsed_engine[key] if key == 'simd' else parsed_engine[key].upper()
                 engine_cmake_opts = engine_cmake_opts.replace('$' + key + '$', value)
 
+                # deal with avx_512f : TODO: not working ... will fix it later
+                # if parsed_engine[key] == 'AVX_512':
+                #     engine_cmake_opts += " g++ -O3 -mavx512f -std=c++11 \
+                #     -D GMX_IDENTIFY_AVX512_FMA_UNITS_STANDALONE=1 \
+                #     -D GMX_X86_GCC_INLINE_ASM=1 \
+                #     -D SIMD_AVX_512_CXX_SUPPORTED=1 \
+                #     /var/tmp/{source_dir}/src/gromacs/hardware/identifyavx512fmaunits.cpp \
+                #     -o /var/tmp/{source_dir}/{build_directory}/bin/identifyavx512fmaunits\
+                #     ".format(
+                #         source_dir=self.source_directory,
+                #         build_directory=self.build_directory.format(simd=parsed_engine[key])
+                #     )
+
+                #     self.postinstall = ['cp /var/tmp/{source_dir}/{build_directory}/bin/identifyavx512fmaunits {prefix}/bin.{simd}/bin'.format(
+                #         source_dir=self.source_directory,
+                #         build_directory=self.build_directory.format(simd=parsed_engine[key]),
+                #         prefix=self.prefix,
+                #         simd=parsed_engine[key])
+                #     ]
+
             self.stage += hpccm.building_blocks.generic_cmake(cmake_opts=engine_cmake_opts.split(),
                                                               directory=self.source_directory,
                                                               build_directory=self.build_directory.format(simd=parsed_engine['simd']),
                                                               prefix=self.prefix,
                                                               build_environment=self.build_environment,
                                                               url=self.url,
-                                                              check=self.check)
+                                                              check=self.check,
+                                                              postinstall=self.postinstall)
 
     def __parse_engine(self, engine):
         '''
@@ -191,7 +220,7 @@ class Gromacs:
 
     def __get_bin_libs_suffix(self, rdtscp, *, args, building_blocks):
         '''
-        Set tgmx binaries and library suffix based on mpi enabled/disabled,
+        Set gmx binaries and library suffix based on mpi enabled/disabled,
         double precision enabled and disabled and
         rdtscp enabled/disabled
         '''

@@ -9,7 +9,7 @@ HPCCM recipes for GROMACS build and installation
     ./gromacs_docker_builds.py --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
 
 ## Running Image
-The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled (enabling double precision not supported yet):
+The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled (enabling double precision not tested yet):
 
 * `gmx`
 * `gmx_mpi`

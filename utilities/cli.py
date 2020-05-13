@@ -12,6 +12,7 @@ import config
 class CLI:
     '''
     Command Line Interface to gather information regarding the container specification from the user
+    User can choose to have multiple GROMACS build within the same container image
     '''
 
     def __init__(self, *, parser):
@@ -22,28 +23,32 @@ class CLI:
         self.args = self.parser.parse_args()
 
     def __set_cmd_options(self):
+        '''
+        Seting up command line options with all available choices for each option
+        '''
         self.parser.add_argument('--format', type=str, default='docker', choices=['docker', 'singularity'],
-                                 help='Container specification format (default: docker).')
+                                 help='CONTAINER specification format (DEFAULT: docker).')
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
                                  choices=['2020.1', '2020.2'],
-                                 help='set GROMACS version (default: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
+                                 help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
         self.parser.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
-                                 help='set fftw version. If not provided, GROMACS installtion will download and build FFTW from source.')
+                                 help='FFTW version. If not provided, GROMACS installtion will download and build FFTW from source.')
 
         self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
                                  choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
-                                 help='cmake version (default: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
+                                 help='CMAKE version (DEFAULT: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
 
         self.parser.add_argument('--gcc', type=str, default=config.DEFAULT_GCC_VERSION,
                                  choices=['5', '6', '7', '8', '9'],
-                                 help='gcc version (default: {0}).'.format(config.DEFAULT_GCC_VERSION))
+                                 help='GCC version (DEFAULT: {0}).'.format(config.DEFAULT_GCC_VERSION))
 
-        # Optional environment requirement
-        self.parser.add_argument('--cuda', type=str, help='enable and set cuda version.')
+        self.parser.add_argument('--cuda', type=str,
+                                 choices=['9.1', '10.0', '10.1'],
+                                 help='ENABLE and set CUDA version.')
 
-        self.parser.add_argument('--double', action='store_true', help='enable double precision.')
-        self.parser.add_argument('--regtest', action='store_true', help='enable regression testing.')
+        self.parser.add_argument('--double', action='store_true', help='ENABLE DOUBLE precision (!!!NOT TESTED YET!!!).')
+        self.parser.add_argument('--regtest', action='store_true', help='ENABLE REGRESSION testing.')
 
         # set mutually exclusive options
         self.__set_mpi_options()
@@ -53,28 +58,42 @@ class CLI:
         self.__set_gromacs_engines()
 
     def __set_mpi_options(self):
+        '''
+        Setting up mpi option. User can choose only one option from (openmpi, impi, ....)
+        At this moment, only openmpi is supported
+        '''
         mpi_group = self.parser.add_mutually_exclusive_group()
         mpi_group.add_argument('--openmpi', type=str,
                                choices=['3.0.0', '4.0.0'],
-                               help='enable and set OpenMPI version.')
-        mpi_group.add_argument('--impi', type=str, help='enable and set Intel MPI version.')
+                               help='ENABLE and set OpenMPI version.')
+        mpi_group.add_argument('--impi', type=str,
+                               choices=['!!!Not Implemented Yet!!!'],
+                               help='ENABLE and set IntelMPI version.')
 
     def __set_linux_distribution(self):
+        '''
+        User can specify linux distro that will be the base image of the final container image
+        Available choices: {ubuntu, centos}
+        '''
         linux_dist_group = self.parser.add_mutually_exclusive_group()
         linux_dist_group.add_argument('--ubuntu', type=str,
                                       choices=['16.04', '18.04', '19.10', '20.4'],
-                                      help='enable and set linux dist : ubuntu.')
+                                      help='ENABLE and set UBUNTU version.')
         linux_dist_group.add_argument('--centos', type=str,
                                       choices=['5', '6', '7', '8'],
-                                      help='enable and set linux dist : centos.')
+                                      help='ENABLE and set CENTOS version.')
 
     def __set_gromacs_engines(self):
+        '''
+        Using this option user can specify SIMD instruction set from [sse2, avx, avx, avx_512f].
+        For each SIMD instruction set, user can also specify whether to turn on RDTSCP ON or OFF
+        '''
         self.parser.add_argument('--engines', type=str,
                                  metavar='simd={simd}:rdtscp={rdtscp}'.format(simd='|'.join(config.ENGINE_OPTIONS['simd']),
                                                                               rdtscp='|'.join(config.ENGINE_OPTIONS['rdtscp'])),
                                  nargs='+',
                                  default=[self.__get_default_gromacs_engine()],
-                                 help='Specifying SIMD for multiple gmx engines within same image container. List of Available choices: {choices} \n(default: {default} ["based on your cpu"]).'.format(
+                                 help='SIMD for multiple GROMACS engines within same image container. List of Available choices: {choices} \n(DEFAULT: {default} ["Based on container\'s HOST"]).'.format(
                                      choices=['simd=sse2:rdtscp=off', 'simd=sse2:rdtscp=on', 'simd=avx:rdtscp=off', 'simd=avx:rdtscp=on',
                                               'simd=avx2:rdtscp=off', 'simd=avx2:rdtscp=on', 'simd=avx_512f:rdtscp=off', 'simd=avx_512f:rdtscp=on'],
                                      default=self.__get_default_gromacs_engine())
@@ -82,7 +101,7 @@ class CLI:
 
     def __get_default_gromacs_engine(self):
         '''
-        Decide the engine's Architecture by inspecting the underlying system where the script run
+        Decide the engine's SIMD Architecture by inspecting the underlying system where the script runs
         '''
         if sys.platform in ['linux', 'linux2']:
             flags = os.popen('cat /proc/cpuinfo | grep ^flags | head -1').read()
