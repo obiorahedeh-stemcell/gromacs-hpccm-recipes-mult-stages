@@ -1,7 +1,7 @@
 # GROMACS
 HPCCM recipes for GROMACS build and installation
 
-#### Usage:
+## Generating Container Specification File
 
     $ ./gromacs_docker_builds.py -h/--help
 
@@ -15,8 +15,23 @@ HPCCM recipes for GROMACS build and installation
                             [--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}]
                             [--engines simd=avx_512f|avx2|avx|sse2:rdtscp=on|off [simd=avx_512f|avx2|avx|sse2:rdtscp=on|off ...]]
 
-##### Sample Commands To Generate Container Specification File
-    ./gromacs_docker_builds.py --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
+##### Sample command to Generate Container Specification File for Docker:
+    ./gromacs_docker_builds.py --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
+
+##### Choosing `SIMD` and `RDTSCP` instruction for `GROMACS` build using the option `--engines` :
+###### Value format:
+     simd=avx_512f|avx2|avx|sse2:rdtscp=on|off
+###### Example (Warning: There should be no space in `--engines` option value)
+     simd=avx2:rdtscp=on
+
+It is possible to choose multiple value for `--engines` to have multiple `GROMACS` installation within the same container as follows:
+
+    --engines simd=sse2:rdtscp=on simd=avx2:rdtscp=on
+
+## Generating Docker Image
+    docker build -t <image_name> .
+
+The above commands assumes that it is run in the directory where `Dockerfile` is located.
 
 ## Running Image
 The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled (enabling double precision not tested yet):
@@ -25,6 +40,13 @@ The Available GROMACS wrapper binaries will be the followings based on `mpi` ena
 * `gmx_mpi`
 
 #### With Singularity
+Build Singularity image from Docker:
+
+    singularity build <name of image to be built> docker://<docker_image>
+
+Example of running `mdrun` with `gmx_mpi` wrapper:
+
+    mpirun -np <no of processes> singulairty exec -B <host directory to bind> <singularity image> mdrun_mpi -s <.tpr file> -deffnm <ouput_file_name>
 
 #### Without Singularity
 
