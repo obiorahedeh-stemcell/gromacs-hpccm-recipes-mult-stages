@@ -48,6 +48,8 @@ Example of running `mdrun` with `gmx_mpi` wrapper:
 
     mpirun -np <no of processes> singulairty exec -B <host directory to bind> <singularity image> mdrun_mpi -s <.tpr file> -deffnm <ouput_file_name>
 
+Before running the above command, you have to make sure that you have added appropriate module for `gcc`, `openmpi` and `cuda`.
+
 #### Without Singularity
 
 Bind the directory that you want Docker to get access to. Below is an example of running `mdrun` module using `gmx` wrapper:
