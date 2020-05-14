@@ -65,6 +65,7 @@ class Gromacs:
         if self.previous_stages.get('dev', None) is not None:
             if building_blocks.get('fftw', None) is not None:
                 self.stage += building_blocks['fftw'].runtime(_from='dev')
+                self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw'})
 
             if building_blocks.get('mpi', None) is not None:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
@@ -195,7 +196,7 @@ class Gromacs:
         #  fftw
         if building_blocks.get('fftw', None) is not None:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$fft$', 'GMX_FFT_LIBRARY=fftw3')
-            self.build_environment['CMAKE_PREFIX_PATH'] = '\'/usr/local/fftw\''
+            # self.build_environment['CMAKE_PREFIX_PATH'] = '\'/usr/local/fftw\''
         else:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$fft$', 'GMX_BUILD_OWN_FFTW=ON')
 
