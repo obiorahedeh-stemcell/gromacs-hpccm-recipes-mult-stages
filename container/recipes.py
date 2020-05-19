@@ -19,7 +19,15 @@ from container.apps import Gromacs
 current_module = sys.modules[__name__]
 
 # common os packages required in the final image
-os_packages = ['vim']
+os_packages = ['vim',
+               'build-essential',
+               'ca-certificates',
+               'git',
+               'libhwloc-dev',
+               'liblapack-dev',
+               'libx11-dev',
+               'ninja-build',
+               'wget']
 
 
 def get_base_image(*, args):
