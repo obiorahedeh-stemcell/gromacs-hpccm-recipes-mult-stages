@@ -13,13 +13,20 @@ class Gromacs:
     '''
     This class is responsible to build and install GROMACS with and withou regression test
     '''
+    # _os_packages = ['build-essential',
+    #                 'ca-certificates',
+    #                 'libhwloc-dev',
+    #                 'libblas-dev',
+    #                 'liblapack-dev',
+    #                 'ninja-build',
+    #                 'wget',
+    #                 'perl', ]
+
     _os_packages = ['build-essential',
                     'ca-certificates',
-                    'libhwloc-dev',
-                    'ninja-build',
-                    'liblapack-dev',
                     'wget',
                     'perl', ]
+
     _cmake_opts = "\
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_BINDIR=bin.$simd$ \
