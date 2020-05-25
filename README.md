@@ -65,3 +65,7 @@ Bind the directory that you want Docker to get access to. Below is an example of
 * `openmpi`
 * `fftw`
 
+## Other Resources:
+[User's Guide](https://docs.google.com/document/d/1JyqtWeF7qqwZl8uiTT-x8SwCPQJJ1CxIxZzq1TIzq30/edit?usp=sharing)
+
+[Description on High Level Implementation](https://docs.google.com/document/d/11rDU7CB0hsZDpjwdyfr1rBFikXMsMYdbwvLpoldOze8/edit?usp=sharing)

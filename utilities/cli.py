@@ -29,7 +29,7 @@ class CLI:
         self.parser.add_argument('--format', type=str, default='docker', choices=['docker', 'singularity'],
                                  help='CONTAINER specification format (DEFAULT: docker).')
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
-                                 choices=['2020.1', '2020.2'],
+                                 choices=['2019.2', '2020.1', '2020.2'],
                                  help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
         self.parser.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
