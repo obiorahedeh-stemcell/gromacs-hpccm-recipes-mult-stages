@@ -77,6 +77,8 @@ class Gromacs:
 
             if building_blocks.get('mpi', None) is not None:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
+                # Testing for impi
+                # self.stage += hpccm.primitives.environment(variables={'PATH': '/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin'})
 
     def __gromacs(self, *, args, building_blocks):
         '''

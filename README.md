@@ -46,7 +46,7 @@ Build Singularity image from Docker:
 
 Example of running `mdrun` with `gmx_mpi` wrapper:
 
-    mpirun -np <no of processes> singulairty exec -B <host directory to bind> <singularity image> mdrun_mpi -s <.tpr file> -deffnm <ouput_file_name>
+    mpirun -np <no of processes> singularity exec -B <host directory to bind> <singularity image> gmx_mpi mdrun -s <.tpr file> -deffnm <ouput_file_name>
 
 Before running the above command, you have to make sure that you have added appropriate module for `gcc`, `openmpi` and `cuda`.
 

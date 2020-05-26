@@ -33,7 +33,7 @@ class CLI:
                                  help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
         self.parser.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
-                                 help='FFTW version. If not provided, GROMACS installtion will download and build FFTW from source.')
+                                 help='FFTW version. If not provided, GROMACS installation will download and build FFTW from source.')
 
         self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
                                  choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
@@ -67,8 +67,8 @@ class CLI:
                                choices=['3.0.0', '4.0.0'],
                                help='ENABLE and set OpenMPI version.')
         mpi_group.add_argument('--impi', type=str,
-                               choices=['!!!Not Implemented Yet!!!'],
-                               help='ENABLE and set IntelMPI version.')
+                               choices=['2018.3-051', '2019.6-088'],
+                               help='ENABLE and set IntelMPI version. [ Working on IMPLEMENTATION !!! ]')
 
     def __set_linux_distribution(self):
         '''
