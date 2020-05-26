@@ -53,12 +53,12 @@ class Gromacs:
         self.preconfigure = []
         self.postinstall = []
 
-        self.__prepare(stage_name=stage_name, building_blocks=building_blocks)
+        self.__prepare(args=args, stage_name=stage_name, building_blocks=building_blocks)
         self.__gromacs(args=args, building_blocks=building_blocks)
         self.__regtest(args=args)
         self.__add__engines(args=args, building_blocks=building_blocks)
 
-    def __prepare(self, *, stage_name, building_blocks):
+    def __prepare(self, *, args, stage_name, building_blocks):
         '''
         Prepare the stage. Add the base image, ospackages, building blocks and
         runtime for openmpi and fftw from previous stage
@@ -73,12 +73,13 @@ class Gromacs:
         if self.previous_stages.get('dev', None) is not None:
             if building_blocks.get('fftw', None) is not None:
                 self.stage += building_blocks['fftw'].runtime(_from='dev')
-                self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw'})
+                self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'})
 
             if building_blocks.get('mpi', None) is not None:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
-                # Testing for impi
-                # self.stage += hpccm.primitives.environment(variables={'PATH': '/opt/intel/compilers_and_libraries_2018.3.222/linux/mpi/intel64/bin'})
+
+                if args.impi is not None:
+                    self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/opt/intel/compilers_and_libraries/linux/mpi/intel64:$CMAKE_PREFIX_PATH'})
 
     def __gromacs(self, *, args, building_blocks):
         '''
