@@ -48,6 +48,10 @@ Example of running `mdrun` with `gmx_mpi` wrapper:
 
     mpirun -np <no of processes> singularity exec -B <host directory to bind> <singularity image> gmx_mpi mdrun -s <.tpr file> -deffnm <ouput_file_name>
 
+To enable NVIDIA GPU support, please add `--nv` flag to `singularity exec` command as follows:
+
+    mpirun -np <no of processes> singularity exec --nv -B <host directory to bind> <singularity image> gmx_mpi mdrun -s <.tpr file> -deffnm <ouput_file_name>
+
 Before running the above command, you have to make sure that you have added appropriate module for `gcc`, `openmpi` and `cuda`.
 
 #### Without Singularity
