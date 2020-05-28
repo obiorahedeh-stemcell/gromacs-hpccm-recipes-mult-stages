@@ -5,7 +5,7 @@ HPCCM recipes for GROMACS build and installation
 
     $ ./generate_specifications_file.py -h/--help
 
-    generate_specifications_file.py [-h] [--format {docker,singularity}]
+    ./generate_specifications_file.py [-h] [--format {docker,singularity}]
                             [--gromacs {2020.1,2020.2}]
                             [--fftw {3.3.7,3.3.8}]
                             [--cmake {3.14.7,3.15.7,3.16.6,3.17.1}]
