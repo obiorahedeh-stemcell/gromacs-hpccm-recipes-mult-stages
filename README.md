@@ -3,9 +3,9 @@ HPCCM recipes for GROMACS build and installation
 
 ## Generating Container Specification File
 
-    $ ./gromacs_docker_builds.py -h/--help
+    $ ./generate_specifications_file.py -h/--help
 
-    gromacs_docker_builds.py [-h] [--format {docker,singularity}]
+    generate_specifications_file.py [-h] [--format {docker,singularity}]
                             [--gromacs {2020.1,2020.2}]
                             [--fftw {3.3.7,3.3.8}]
                             [--cmake {3.14.7,3.15.7,3.16.6,3.17.1}]
@@ -16,7 +16,7 @@ HPCCM recipes for GROMACS build and installation
                             [--engines simd=avx_512f|avx2|avx|sse2:rdtscp=on|off [simd=avx_512f|avx2|avx|sse2:rdtscp=on|off ...]]
 
 ##### Sample command to Generate Container Specification File for Docker:
-    ./gromacs_docker_builds.py --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
+    ./generate_specifications_file.py --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
 
 ##### Choosing `SIMD` and `RDTSCP` instruction for `GROMACS` build using the option `--engines` :
 ###### Value format:

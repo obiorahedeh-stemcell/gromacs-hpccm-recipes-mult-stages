@@ -5,7 +5,7 @@ Author :
     * Muhammed Ahad <ahad3112@yahoo.com, maaahad@gmail.com>
 
 Usage:
-    $ python3 gromacs_docker_builds.py -h/--help
+    $ python3 generate_specifications_file.py -h/--help
 '''
 
 import hpccm
