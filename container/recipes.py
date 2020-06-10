@@ -28,7 +28,6 @@ os_packages = ['vim',
                'libblas-dev',
                'liblapack-dev',
                'libx11-dev',
-               'ninja-build',
                'wget']
 
 
@@ -184,7 +183,7 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
     # copying the gmx_chooser script
     stage += hpccm.primitives.copy(src='/scripts/gmx_chooser.py',
                                    dest=os.path.join(scripts_directory, 'gmx_chooser.py'))
-    # chmod for files scripts_directory
+    # mod changing for the files in the directory scripts
     stage += hpccm.primitives.shell(commands=['chmod +x {}'.format(
         os.path.join(scripts_directory, '*')
     )])
@@ -200,7 +199,7 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
 
 def prepare_and_cook(*, args):
     '''
-    This method prepare the recipes and cook it
+    This method prepares the recipes and cooks it
     '''
     stages = collections.OrderedDict()
     building_blocks = get_building_blocks(args=args)

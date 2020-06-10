@@ -31,7 +31,9 @@ It is possible to choose multiple value for `--engines` to have multiple `GROMAC
 ## Generating Docker Image
     docker build -t <image_name> .
 
-The above commands assumes that it is run in the directory where `Dockerfile` is located.
+The above commands assumes that it is run from the directory `gromacs-hpccm-recipes-mult-stages` and the `Dockerfile` lives in this directory.
+The reason is that, directory `gromacs-hpccm-recipes-mult-stages` contains some utility scripts what will be
+copied to the final image. In the essence, one have to use this directory as build context.
 
 ## Running Image
 The Available GROMACS wrapper binaries will be the followings based on `mpi` enabled or disabled (enabling double precision not tested yet):

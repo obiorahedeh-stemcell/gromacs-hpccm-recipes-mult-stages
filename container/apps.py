@@ -19,7 +19,8 @@ class Gromacs:
                     'libblas-dev',
                     'liblapack-dev',
                     'wget',
-                    'perl', ]
+                    'perl',
+                    'ninja-build', ]
 
     _cmake_opts = "\
                 -D CMAKE_BUILD_TYPE=Release \
@@ -74,6 +75,8 @@ class Gromacs:
             if building_blocks.get('fftw', None) is not None:
                 self.stage += building_blocks['fftw'].runtime(_from='dev')
                 self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'})
+                # adding ninja build to cmake's build options for faster building process
+                self._cmake_opts += '-G Ninja'
 
             if building_blocks.get('mpi', None) is not None:
                 self.stage += building_blocks['mpi'].runtime(_from='dev')
