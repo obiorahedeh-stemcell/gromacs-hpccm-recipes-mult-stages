@@ -32,8 +32,22 @@ class CLI:
                                  choices=['2019.2', '2020.1', '2020.2'],
                                  help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
-        self.parser.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
-                                 help='FFTW version. If not provided, GROMACS installation will download and build FFTW from source.')
+        # TODO: add option to accept fftw container as input
+        fftw_group = self.parser.add_mutually_exclusive_group()
+        fftw_group.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
+                                 help=('FFTW version. '
+                                       'GROMACS installation will download and '
+                                       'build FFTW from source if neither of '
+                                       '--fftw or --fftw-container argument provided'))
+        fftw_group.add_argument('--fftw-container', type=str,
+                                help=('FFTW container to be used instead of '
+                                      'building it from sources. '
+                                      'GROMACS installation will download and '
+                                      'build FFTW from source if neither of '
+                                      '--fftw or --fftw-container argument provided'))
+        self.parser.add_argument('--fftw-gen-recipe', action="store_true",
+                                 help='Enable this will generate recipe for FFTW only container. [Not Implemented Yet]')
+
 
         self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
                                  choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
@@ -68,7 +82,7 @@ class CLI:
                                help='ENABLE and set OpenMPI version.')
         mpi_group.add_argument('--impi', type=str,
                                choices=['2018.3-051', '2019.6-088'],
-                               help='ENABLE and set IntelMPI version. [ Working on IMPLEMENTATION !!! ]')
+                               help='ENABLE and set IntelMPI version. [ Not Implemented Yet!!! ]')
 
     def __set_linux_distribution(self):
         '''
@@ -93,7 +107,7 @@ class CLI:
                                                                               rdtscp='|'.join(config.ENGINE_OPTIONS['rdtscp'])),
                                  nargs='+',
                                  default=[self.__get_default_gromacs_engine()],
-                                 help='SIMD for multiple GROMACS engines within same image container. List of Available choices: {choices} \n(DEFAULT: {default} ["Based on container\'s HOST"]).'.format(
+                                 help='SIMD for multiple GROMACS engines within same image container. List of Available choices: {choices} \n(DEFAULT: {default} ["Based on scripts HOST"]).'.format(
                                      choices=['simd=sse2:rdtscp=off', 'simd=sse2:rdtscp=on', 'simd=avx:rdtscp=off', 'simd=avx:rdtscp=on',
                                               'simd=avx2:rdtscp=off', 'simd=avx2:rdtscp=on', 'simd=avx_512f:rdtscp=off', 'simd=avx_512f:rdtscp=on'],
                                      default=self.__get_default_gromacs_engine())

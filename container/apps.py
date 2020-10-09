@@ -70,19 +70,31 @@ class Gromacs:
             if building_blocks.get(bb, None) is not None:
                 self.stage += building_blocks[bb]
 
-        # adding runtime for fftw from dev stage
-        if self.previous_stages.get('dev', None) is not None:
-            if building_blocks.get('fftw', None) is not None:
-                self.stage += building_blocks['fftw'].runtime(_from='dev')
-                self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'})
-                # adding ninja build to cmake's build options for faster building process
-                self._cmake_opts += '-G Ninja'
+        # fftw
+        if args.fftw_container:
+            self.stage += hpccm.primitives.copy(_from=args.fftw_container,
+                                                _mkdir=True,
+                                                src=['/usr/local/lib'],
+                                                dest='/usr/local/fftw/lib')
 
-            if building_blocks.get('mpi', None) is not None:
-                self.stage += building_blocks['mpi'].runtime(_from='dev')
+            self.stage += hpccm.primitives.copy(_from=args.fftw_container,
+                                                _mkdir=True,
+                                                src=['/usr/local/include'],
+                                                dest='/usr/local/fftw/include')
+        elif args.fftw:
+            self.stage += building_blocks['fftw'].runtime(_from='dev')
 
-                if args.impi is not None:
-                    self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/opt/intel/compilers_and_libraries/linux/mpi/intel64:$CMAKE_PREFIX_PATH'})
+        if args.fftw_container or args.fftw:
+            self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'})
+            # adding ninja build to cmake's build options for faster building process
+            self._cmake_opts += '-G Ninja'
+
+        # mpi
+        if building_blocks.get('mpi', None) is not None:
+            # This means, mpi has been installed in the dev stage
+            self.stage += building_blocks['mpi'].runtime(_from='dev')
+            # if args.impi is not None:
+            #     self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/opt/intel/compilers_and_libraries/linux/mpi/intel64:$CMAKE_PREFIX_PATH'})
 
     def __gromacs(self, *, args, building_blocks):
         '''
@@ -212,7 +224,7 @@ class Gromacs:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$mpi$', 'OFF')
 
         #  fftw
-        if building_blocks.get('fftw', None) is not None:
+        if args.fftw or args.fftw_container:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$fft$', 'GMX_FFT_LIBRARY=fftw3')
             # self.build_environment['CMAKE_PREFIX_PATH'] = '\'/usr/local/fftw\''
         else:

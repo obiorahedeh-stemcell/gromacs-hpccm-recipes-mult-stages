@@ -103,6 +103,7 @@ def get_fftw(*, args, building_blocks):
     '''
     fftw :
     '''
+
     if args.fftw is not None:
         if building_blocks.get('compiler', None) is not None:
             if hasattr(building_blocks['compiler'], 'toolchain'):
@@ -159,12 +160,31 @@ def get_deployment_stage(*, args, previous_stages, building_blocks, wrapper):
     stage += building_blocks['compiler'].runtime()
 
     # adding runtime from previous stages
-    if previous_stages.get('dev', None) is not None:
-        if building_blocks.get('fftw', None) is not None:
-            stage += building_blocks['fftw'].runtime(_from='dev')
+    # fftw
+    if args.fftw_container:
+        stage += hpccm.primitives.copy(_from=args.fftw_container,
+                                       _mkdir=True,
+                                       src=['/usr/local/lib'],
+                                       dest='/usr/local/fftw/lib')
 
-        if building_blocks.get('mpi', None) is not None:
-            stage += building_blocks['mpi'].runtime(_from='dev')
+        stage += hpccm.primitives.copy(_from=args.fftw_container,
+                                       _mkdir=True,
+                                       src=['/usr/local/include'],
+                                       dest='/usr/local/fftw/include')
+        # adding fftw library path
+        stage += hpccm.primitives.environment(
+            variables={'LD_LIBRARY_PATH': '/usr/local/fftw/lib:$LD_LIBRARY_PATH'}
+        )
+
+    elif args.fftw:
+        # library path will be added automatically by runtime
+        stage += building_blocks['fftw'].runtime(_from='dev')
+
+    # mpi
+    if building_blocks.get('mpi', None) is not None:
+        # This means, mpi has been installed in the dev stage
+        stage += building_blocks['mpi'].runtime(_from='dev')
+
 
     if previous_stages.get('gromacs', None) is not None:
         stage += hpccm.primitives.copy(_from='gromacs',
