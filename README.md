@@ -1,21 +1,21 @@
 # GROMACS
 HPCCM recipes for generating FFTW/GROMACS contianer specification file.
 
-## The recipe contains two sub-command, one for FFTW and the other for GROMACS
+#### The recipe contains two sub-commands, one for FFTW and the other for GROMACS :
 
-  $ ./generate_specifications_file.py -h
-  ./generate_specifications_file.py [-h] {fftw,gmx} ...
+    $ ./generate_specifications_file.py -h
+    ./generate_specifications_file.py [-h] {fftw,gmx} ...
 
 ## Generating Container Specification File for FFTW
 
-  $ ./generate_specifications_file.py fftw -h/--help
-  ./generate_specifications_file.py fftw [-h] [--format {docker,singularity}] [--gcc {5,6,7,8,9}] [--double]
-                                            (--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}) [--fftw {3.3.7,3.3.8}] --simd
-                                            {sse2,avx,avx2,avx512} [{sse2,avx,avx2,avx512} ...]
+    $ ./generate_specifications_file.py fftw -h/--help
+    ./generate_specifications_file.py fftw [-h] [--format {docker,singularity}] [--gcc {5,6,7,8,9}] [--double]
+                                              (--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}) [--fftw {3.3.7,3.3.8}] --simd
+                                              {sse2,avx,avx2,avx512} [{sse2,avx,avx2,avx512} ...]
 
 ##### Sample command to Generate Container Specification File for Docker :
 
-  ./generate_specifications_file.py fftw --format docker --ubuntu 18.04  --fftw 3.3.7 --gcc 8 --simd avx avx2 sse2 avx512 > Dockerfile
+    ./generate_specifications_file.py fftw --format docker --ubuntu 18.04  --fftw 3.3.7 --gcc 8 --simd avx avx2 sse2 avx512 > Dockerfile
 
 ## Generating Container Specification File for GROMACS
 
