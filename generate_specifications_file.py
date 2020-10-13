@@ -15,13 +15,15 @@ Desctiption:
 import hpccm
 
 import argparse
-from utilities.cli import CLI
+from utilities.cli import CLI, add_cli
 import container.recipes as recipes
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='HPCCM recipes for generating GROMACS container\'s specification file.')
-    cli = CLI(parser=parser)
+    parser = argparse.ArgumentParser(
+        description='HPCCM recipes for generating FFTW/GROMACS container\'s specification file.'
+    )
+    args = add_cli(parser=parser)
 
-    hpccm.config.set_container_format(cli.args.format)
+    hpccm.config.set_container_format(args.format)
 
-    recipes.prepare_and_cook(args=cli.args)
+    args.handler(args=args)

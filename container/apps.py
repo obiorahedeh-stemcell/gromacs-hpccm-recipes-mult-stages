@@ -45,10 +45,9 @@ class Gromacs:
                 -D GMX_LIBS_SUFFIX=$libs_suffix$ \
                 "
 
-    def __init__(self, *, stage_name, base_image, args, building_blocks, previous_stages):
+    def __init__(self, *, stage_name, base_image, args, building_blocks):
         self.stage = hpccm.Stage()
         self.base_image = base_image
-        self.previous_stages = previous_stages
         # The following two will be required in generic_cmake
         self.check = False
         self.preconfigure = []
@@ -85,7 +84,9 @@ class Gromacs:
             self.stage += building_blocks['fftw'].runtime(_from='dev')
 
         if args.fftw_container or args.fftw:
-            self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'})
+            self.stage += hpccm.primitives.environment(
+                variables={'CMAKE_PREFIX_PATH': '/usr/local/fftw:$CMAKE_PREFIX_PATH'}
+            )
             # adding ninja build to cmake's build options for faster building process
             self._cmake_opts += '-G Ninja'
 
@@ -93,8 +94,7 @@ class Gromacs:
         if building_blocks.get('mpi', None) is not None:
             # This means, mpi has been installed in the dev stage
             self.stage += building_blocks['mpi'].runtime(_from='dev')
-            # if args.impi is not None:
-            #     self.stage += hpccm.primitives.environment(variables={'CMAKE_PREFIX_PATH': '/opt/intel/compilers_and_libraries/linux/mpi/intel64:$CMAKE_PREFIX_PATH'})
+
 
     def __gromacs(self, *, args, building_blocks):
         '''

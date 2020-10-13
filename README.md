@@ -1,22 +1,37 @@
 # GROMACS
-HPCCM recipes for GROMACS build and installation
+HPCCM recipes for generating FFTW/GROMACS contianer specification file.
 
-## Generating Container Specification File
+## The recipe contains two sub-command, one for FFTW and the other for GROMACS
 
-    $ ./generate_specifications_file.py -h/--help
+  $ ./generate_specifications_file.py -h
+  ./generate_specifications_file.py [-h] {fftw,gmx} ...
 
-    ./generate_specifications_file.py [-h] [--format {docker,singularity}]
-                            [--gromacs {2020.1,2020.2}]
-                            [--fftw {3.3.7,3.3.8}]
-                            [--cmake {3.14.7,3.15.7,3.16.6,3.17.1}]
-                            [--gcc {5,6,7,8,9}] [--cuda {9.1,10.0,10.1}]
-                            [--double] [--regtest]
-                            [--openmpi {3.0.0,4.0.0} | --impi {!!!Not Implemented Yet!!!}]
-                            [--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}]
-                            [--engines simd=avx_512f|avx2|avx|sse2:rdtscp=on|off [simd=avx_512f|avx2|avx|sse2:rdtscp=on|off ...]]
+## Generating Container Specification File for FFTW
 
-##### Sample command to Generate Container Specification File for Docker:
-    ./generate_specifications_file.py --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
+  $ ./generate_specifications_file.py fftw -h/--help
+  ./generate_specifications_file.py fftw [-h] [--format {docker,singularity}] [--gcc {5,6,7,8,9}] [--double]
+                                            (--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}) [--fftw {3.3.7,3.3.8}] --simd
+                                            {sse2,avx,avx2,avx512} [{sse2,avx,avx2,avx512} ...]
+
+##### Sample command to Generate Container Specification File for Docker :
+
+  ./generate_specifications_file.py fftw --format docker --ubuntu 18.04  --fftw 3.3.7 --gcc 8 --simd avx avx2 sse2 avx512 > Dockerfile
+
+## Generating Container Specification File for GROMACS
+
+    $ ./generate_specifications_file.py gmx -h/--help
+
+    ./generate_specifications_file.py gmx [-h] [--format {docker,singularity}] [--gcc {5,6,7,8,9}] [--double]
+                                           (--ubuntu {16.04,18.04,19.10,20.4} | --centos {5,6,7,8}) [--gromacs {2019.2,2020.1,2020.2,2020.3}]
+                                           [--fftw {3.3.7,3.3.8} | --fftw-container FFTW_CONTAINER] [--cuda {9.1,10.0,10.1}] [--regtest]
+                                           [--cmake {3.14.7,3.15.7,3.16.6,3.17.1}] [--openmpi {3.0.0,4.0.0} | --impi {2018.3-051,2019.6-088}]
+                                           [--engines simd=avx_512f|avx2|avx|sse2:rdtscp=on|off [simd=avx_512f|avx2|avx|sse2:rdtscp=on|off ...]]
+
+##### Sample command to Generate Container Specification File for Docker provided with `fftw version` :
+    ./generate_specifications_file.py gmx --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw-container gromacs/fftw > Dockerfile
+
+##### Sample command to Generate Container Specification File for Docker provided with `fftw container` :
+    ./generate_specifications_file.py gmx --format docker --gromacs 2020.1 --ubuntu 18.04 --gcc 9 --cmake 3.17.1 --engines simd=sse2:rdtscp=off simd=sse2:rdtscp=on  --openmpi 3.0.0 --regtest --fftw 3.3.7> Dockerfile
 
 ##### Choosing `SIMD` and `RDTSCP` instruction for `GROMACS` build using the option `--engines` :
 ###### Value format:

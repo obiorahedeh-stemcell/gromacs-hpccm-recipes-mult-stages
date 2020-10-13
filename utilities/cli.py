@@ -2,34 +2,116 @@
 Author :
     * Muhammed Ahad <ahad3112@yahoo.com, maaahad@gmail.com>
 '''
+# python stdlib
 import sys
 import os
 import collections
 
+# in-house
 import config
+import container.recipes as recipes
+
+
+
+def add_cli(*, parser):
+    subparsers = parser.add_subparsers(help="sub-command help")
+    FftwCLI(subparsers=subparsers)
+    GromacsCLI(subparsers=subparsers)
+
+    return parser.parse_args()
+
+
 
 
 class CLI:
     '''
-    Command Line Interface to gather information regarding the container specification from the user
-    User can choose to have multiple GROMACS build within the same container image
+    This is the base class for generating container specification file for both
+    FFTW and GMX
+    '''
+    def __init__(self, *, command, subparsers, handler):
+        self.parser = subparsers.add_parser(
+            command, help=f'{command} help'
+        )
+
+        self.parser.set_defaults(handler=handler)
+
+        self.__set_cmd_options()
+
+    def __set_cmd_options(self):
+        self.parser.add_argument('--format', type=str,
+                                 default='docker',
+                                 choices=['docker', 'singularity'],
+                                 help='CONTAINER specification format (DEFAULT: docker).')
+
+        self.parser.add_argument('--gcc', type=str, default=config.DEFAULT_GCC_VERSION,
+                                 choices=['5', '6', '7', '8', '9'],
+                                 help='GCC version (DEFAULT: {0}).'.format(config.DEFAULT_GCC_VERSION))
+
+        self.parser.add_argument('--double', action='store_true',
+                                 help='ENABLE DOUBLE precision (!!!NOT TESTED YET!!!).')
+
+        self.__set_linux_distribution()
+
+    def __set_linux_distribution(self):
+        '''
+        User can specify linux distro that will be the base image of the final container image
+        Available choices: {ubuntu, centos}
+        '''
+        linux_dist_group = self.parser.add_mutually_exclusive_group(required=True)
+        linux_dist_group.add_argument('--ubuntu', type=str,
+                                      choices=['16.04', '18.04', '19.10', '20.4'],
+                                      help='ENABLE and set UBUNTU version as BASE IMAGE.')
+        linux_dist_group.add_argument('--centos', type=str,
+                                      choices=['5', '6', '7', '8'],
+                                      help='ENABLE and set CENTOS version as BASE IMAGE.')
+
+
+
+class FftwCLI(CLI):
+    '''
+    Command Line Interface to configure FFTW only container
+    '''
+    def __init__(self, *, subparsers):
+        CLI.__init__(self, command='fftw',
+                     subparsers=subparsers,
+                     handler=recipes.prepare_and_cook_fftw)
+        self.__set_cmd_options()
+
+
+    def __set_cmd_options(self):
+        self.parser.add_argument('--fftw', type=str,
+                                 choices=['3.3.7', '3.3.8'],
+                                 help='FFTW version.')
+
+        self.parser.add_argument('--simd',
+                                 required=True,
+                                 choices=['sse2', 'avx', 'avx2', 'avx512'],
+                                 nargs='+',
+                                 help=('List of simd instruction set, '
+                                       'Multiple option can be chosen separated by space.')
+                                 )
+
+class GromacsCLI(CLI):
+    '''
+    Command Line Interface to gather information regarding the container
+    specification for GROMACS from the user. User can choose to have multiple
+    GROMACS build within the same container image.
     '''
 
-    def __init__(self, *, parser):
-        self.parser = parser
+    def __init__(self, *, subparsers):
+        # self.parser = parser
+        CLI.__init__(self, command='gmx', subparsers=subparsers, handler=recipes.prepare_and_cook_gromacs)
         # Setting Command line arguments
         self.__set_cmd_options()
         # Parsing command line arguments
-        self.args = self.parser.parse_args()
+        # self.args = self.parser.parse_args()
 
     def __set_cmd_options(self):
         '''
         Seting up command line options with all available choices for each option
         '''
-        self.parser.add_argument('--format', type=str, default='docker', choices=['docker', 'singularity'],
-                                 help='CONTAINER specification format (DEFAULT: docker).')
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
-                                 choices=['2019.2', '2020.1', '2020.2'],
+                                 choices=['2019.2', '2020.1', '2020.2', '2020.3'],
                                  help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
         # TODO: add option to accept fftw container as input
@@ -45,28 +127,20 @@ class CLI:
                                       'GROMACS installation will download and '
                                       'build FFTW from source if neither of '
                                       '--fftw or --fftw-container argument provided'))
-        self.parser.add_argument('--fftw-gen-recipe', action="store_true",
-                                 help='Enable this will generate recipe for FFTW only container. [Not Implemented Yet]')
-
-
-        self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
-                                 choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
-                                 help='CMAKE version (DEFAULT: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
-
-        self.parser.add_argument('--gcc', type=str, default=config.DEFAULT_GCC_VERSION,
-                                 choices=['5', '6', '7', '8', '9'],
-                                 help='GCC version (DEFAULT: {0}).'.format(config.DEFAULT_GCC_VERSION))
 
         self.parser.add_argument('--cuda', type=str,
                                  choices=['9.1', '10.0', '10.1'],
                                  help='ENABLE and set CUDA version.')
 
-        self.parser.add_argument('--double', action='store_true', help='ENABLE DOUBLE precision (!!!NOT TESTED YET!!!).')
         self.parser.add_argument('--regtest', action='store_true', help='ENABLE REGRESSION testing.')
+
+        self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
+                                 choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
+                                 help='CMAKE version (DEFAULT: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
 
         # set mutually exclusive options
         self.__set_mpi_options()
-        self.__set_linux_distribution()
+
 
         # set gromacs engine specification
         self.__set_gromacs_engines()
@@ -83,19 +157,6 @@ class CLI:
         mpi_group.add_argument('--impi', type=str,
                                choices=['2018.3-051', '2019.6-088'],
                                help='ENABLE and set IntelMPI version. [ Not Implemented Yet!!! ]')
-
-    def __set_linux_distribution(self):
-        '''
-        User can specify linux distro that will be the base image of the final container image
-        Available choices: {ubuntu, centos}
-        '''
-        linux_dist_group = self.parser.add_mutually_exclusive_group()
-        linux_dist_group.add_argument('--ubuntu', type=str,
-                                      choices=['16.04', '18.04', '19.10', '20.4'],
-                                      help='ENABLE and set UBUNTU version as BASE IMAGE.')
-        linux_dist_group.add_argument('--centos', type=str,
-                                      choices=['5', '6', '7', '8'],
-                                      help='ENABLE and set CENTOS version as BASE IMAGE.')
 
     def __set_gromacs_engines(self):
         '''
