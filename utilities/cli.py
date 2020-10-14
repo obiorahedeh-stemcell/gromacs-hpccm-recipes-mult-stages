@@ -80,6 +80,7 @@ class FftwCLI(CLI):
 
     def __set_cmd_options(self):
         self.parser.add_argument('--fftw', type=str,
+                                 required=True,
                                  choices=['3.3.7', '3.3.8'],
                                  help='FFTW version.')
 
