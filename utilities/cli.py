@@ -112,7 +112,6 @@ class GromacsCLI(CLI):
         Seting up command line options with all available choices for each option
         '''
         self.parser.add_argument('--gromacs', type=str, default=config.DEFAULT_GROMACS_VERSION,
-                                 choices=['2019.2', '2020.1', '2020.2', '2020.3'],
                                  help='GROMACS version (DEFAULT: {0}).'.format(config.DEFAULT_GROMACS_VERSION))
 
         # TODO: add option to accept fftw container as input
