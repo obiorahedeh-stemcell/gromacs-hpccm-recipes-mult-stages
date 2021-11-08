@@ -233,7 +233,7 @@ class Gromacs:
         # cuda, regtest, double
         for (option, enabled) in zip(['cuda', 'regtest', 'double'], [args.cuda, args.regtest, args.double]):
             if enabled:
-                gromacs_cmake_opts = gromacs_cmake_opts.replace('$' + option + '$', 'ON')
+                gromacs_cmake_opts = gromacs_cmake_opts.replace('$' + option + '$', 'CUDA')
             else:
                 gromacs_cmake_opts = gromacs_cmake_opts.replace('$' + option + '$', 'OFF')
 
