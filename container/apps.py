@@ -37,7 +37,7 @@ class Gromacs:
                 -D $fft$ \
                 -D GMX_EXTERNAL_BLAS=OFF \
                 -D GMX_EXTERNAL_LAPACK=OFF \
-                -D BUILD_SHARED_LIBS=OFF \
+                -D BUILD_SHARED_LIBS=ON \
                 -D GMX_PREFER_STATIC_LIBS=ON \
                 -D REGRESSIONTEST_DOWNLOAD=$regtest$ \
                 -D GMX_DEFAULT_SUFFIX=OFF \
