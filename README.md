@@ -19,6 +19,8 @@ HPCCM recipes for generating FFTW/GROMACS contianer specification file.
 
 ## Generating Container Specification File for GROMACS
 
+Note that the options listed here for `gcc`, `ubuntu`, `centos`, `gromacs`, `fftw`, `cuda`, `cmake`, `openmpi`, `impi` are guides to what can be used, and these options are not set to specific choices. `engine` and `simd` choices are constrained though, and the source code will need to be modified if you which to extend these.
+
     $ ./generate_specifications_file.py gmx -h/--help
 
     ./generate_specifications_file.py gmx [-h] [--format {docker,singularity}] [--gcc {5,6,7,8,9}] [--double]
@@ -85,3 +87,5 @@ Bind the directory that you want Docker to get access to. Below is an example of
 * `libgomp1`
 * `openmpi`
 * `fftw`
+
+

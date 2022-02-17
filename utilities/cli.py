@@ -44,7 +44,6 @@ class CLI:
                                  help='CONTAINER specification format (DEFAULT: docker).')
 
         self.parser.add_argument('--gcc', type=str, default=config.DEFAULT_GCC_VERSION,
-                                 choices=['5', '6', '7', '8', '9'],
                                  help='GCC version (DEFAULT: {0}).'.format(config.DEFAULT_GCC_VERSION))
 
         self.parser.add_argument('--double', action='store_true',
@@ -59,10 +58,8 @@ class CLI:
         '''
         linux_dist_group = self.parser.add_mutually_exclusive_group(required=True)
         linux_dist_group.add_argument('--ubuntu', type=str,
-                                      choices=['16.04', '18.04', '19.10', '20.4'],
                                       help='ENABLE and set UBUNTU version as BASE IMAGE.')
         linux_dist_group.add_argument('--centos', type=str,
-                                      choices=['5', '6', '7', '8'],
                                       help='ENABLE and set CENTOS version as BASE IMAGE.')
 
 
@@ -81,7 +78,6 @@ class FftwCLI(CLI):
     def __set_cmd_options(self):
         self.parser.add_argument('--fftw', type=str,
                                  required=True,
-                                 choices=['3.3.7', '3.3.8'],
                                  help='FFTW version.')
 
         self.parser.add_argument('--simd',
@@ -116,7 +112,7 @@ class GromacsCLI(CLI):
 
         # TODO: add option to accept fftw container as input
         fftw_group = self.parser.add_mutually_exclusive_group()
-        fftw_group.add_argument('--fftw', type=str, choices=['3.3.7', '3.3.8'],
+        fftw_group.add_argument('--fftw', type=str,
                                  help=('FFTW version. '
                                        'GROMACS installation will download and '
                                        'build FFTW from source if neither of '
@@ -129,13 +125,11 @@ class GromacsCLI(CLI):
                                       '--fftw or --fftw-container argument provided'))
 
         self.parser.add_argument('--cuda', type=str,
-                                 choices=['9.1', '10.0', '10.1'],
                                  help='ENABLE and set CUDA version.')
 
         self.parser.add_argument('--regtest', action='store_true', help='ENABLE REGRESSION testing.')
 
         self.parser.add_argument('--cmake', type=str, default=config.DEFAULT_CMAKE_VERSION,
-                                 choices=['3.14.7', '3.15.7', '3.16.6', '3.17.1'],
                                  help='CMAKE version (DEFAULT: {0}).'.format(config.DEFAULT_CMAKE_VERSION))
 
         # set mutually exclusive options
@@ -152,10 +146,8 @@ class GromacsCLI(CLI):
         '''
         mpi_group = self.parser.add_mutually_exclusive_group()
         mpi_group.add_argument('--openmpi', type=str,
-                               choices=['3.0.0', '4.0.0'],
                                help='ENABLE and set OpenMPI version.')
         mpi_group.add_argument('--impi', type=str,
-                               choices=['2018.3-051', '2019.6-088'],
                                help='ENABLE and set IntelMPI version. [ Not Implemented Yet!!! ]')
 
     def __set_gromacs_engines(self):
