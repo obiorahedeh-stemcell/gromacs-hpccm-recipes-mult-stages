@@ -29,7 +29,7 @@ class Gromacs:
                 -D CMAKE_C_COMPILER=$c_compiler$ \
                 -D CMAKE_CXX_COMPILER=$cxx_compiler$ \
                 -D GMX_OPENMP=ON \
-                -D GMX_MPI=$mpi$ \
+                -D GMX_MPI=ON \
                 -D GMX_GPU=$cuda$ \
                 -D GMX_SIMD=$simd$ \
                 -D GMX_USE_RDTSCP=$rdtscp$ \
@@ -221,7 +221,7 @@ class Gromacs:
         else:
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$c_compiler$', 'gcc')
             gromacs_cmake_opts = gromacs_cmake_opts.replace('$cxx_compiler$', 'g++')
-            gromacs_cmake_opts = gromacs_cmake_opts.replace('$mpi$', 'OFF')
+            gromacs_cmake_opts = gromacs_cmake_opts.replace('$mpi$', 'ON')
 
         #  fftw
         if args.fftw or args.fftw_container:
